@@ -5,20 +5,17 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { waypoints, departureTime } = req.body;
+  const { waypoints } = req.body;
 
   const apiKey = process.env.GOOGLE_API_KEY;
 
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${waypoints.join(
-    "|"
-  )}&destinations=${waypoints.join(
-    "|"
-  )}&departure_time=${departureTime}&traffic_model=best_guess&key=${apiKey}`;
+  const origin = waypoints[0];
+  const destination = waypoints[waypoints.length - 1];
+  const waypointsString = waypoints.slice(1, -1).join('|');
 
- 
-    const response = await fetch(url);
+  const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&waypoints=optimize:true|${waypointsString}&key=${apiKey}`;
 
-    const data = await response.json();
-    res.status(200).json(data);
+  const response = await fetch(url);
+  const data = await response.json();
+  res.status(200).json(data);
 }
-//
